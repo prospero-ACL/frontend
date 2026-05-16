@@ -1,0 +1,14 @@
+FROM node:26-alpine
+
+WORKDIR /app
+
+COPY package.json package-lock.json* yarn.lock* ./
+
+RUN npm ci
+
+COPY . .
+
+EXPOSE 5173
+
+# Vite's "--host 0.0.0.0" option ensures it accepts external traffic 
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

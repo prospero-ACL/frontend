@@ -1,0 +1,22 @@
+repos:
+  - repo: local
+    hooks:
+      - id: tsc
+        name: TypeScript Compile Check
+        entry: bash
+        args: ["-c", "npm run typecheck"]
+        language: system
+        pass_filenames: false # tsc doesn't need file args from pre-commit.
+        # ^ "language: system" runs the command as-is in a shell environment.
+
+      - id: lint
+        name: Lint
+        entry: ./scripts/pre-commit-lint.sh
+        language: script
+        pass_filenames: true
+
+      - id: format
+        name: Format
+        entry: ./scripts/pre-commit-format.sh
+        language: script
+        pass_filenames: true
