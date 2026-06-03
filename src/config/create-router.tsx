@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { MainApp } from '@/pages/main-app.page';
+import { MainApp } from '@/pages/main-app/page';
 import { HomePage } from '../pages/Home.page';
+import Chat from '../pages/main-app/components/chat';
 import { onBootStrap } from './reducers/auth.reducer';
 import { ProtectedRouteIsLoggedIn, ProtectedRouteIsLoggedOut } from './route-protection';
 import { useAppDispatch } from './store';
@@ -25,7 +26,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <h2>app</h2>,
+        element: <Chat />,
       },
       {
         path: 'profile',

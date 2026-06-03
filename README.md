@@ -32,3 +32,7 @@ This template comes with the following features:
 - `storybook` – starts storybook dev server
 - `storybook:build` – build production storybook bundle to `storybook-static`
 - `format:write` – formats all files with oxfmt
+
+## Pseudo design files
+
+There is no figma design for the frontend app. The are mock ups done in [tldraw](https://www.tldraw.com/f/78D3VBnwwWg1Hchx6xIxe?d=v0.33.1660.933.page)
