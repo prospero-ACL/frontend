@@ -1,4 +1,5 @@
 import { Text } from '@mantine/core';
+
 export default function Chat() {
   return (
     <>

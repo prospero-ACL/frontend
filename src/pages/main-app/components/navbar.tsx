@@ -15,12 +15,14 @@ export default function Navbar() {
         href="/app/profile"
         label="With right section"
         leftSection={<GaugeIcon size={16} />}
+        active={!!useMatch('/app/profile')}
       />
       <NavLink
         href="/app/docs"
         label="Documents"
         description="Add or remove documents"
         leftSection={<ProhibitIcon size={16} />}
+        active={!!useMatch('/app/docs')}
       />
     </>
   );
