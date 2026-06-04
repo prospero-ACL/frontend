@@ -15,6 +15,7 @@ import {
 import storage from 'redux-persist/es/storage';
 import api from './api';
 import rootReducerMapObject from './reducers';
+import { onBootStrap } from './reducers/auth.reducer';
 
 const rootPersistConfig = {
   key: 'root',
@@ -61,6 +62,7 @@ export const setupStore = (preloadedState?: RootState) =>
 export const store = setupStore();
 export const persistor = persistStore(store);
 setupListeners(store.dispatch);
+store.dispatch(onBootStrap());
 
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;

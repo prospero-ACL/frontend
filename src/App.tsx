@@ -8,10 +8,9 @@ import { theme } from './config/theme';
 
 export default function App() {
   const store = getStore();
-
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
+      <PersistGate loading={<h2>Persistor loading...</h2>} persistor={persistor}>
         <MantineProvider theme={theme} defaultColorScheme="auto">
           <MainRouter />
         </MantineProvider>

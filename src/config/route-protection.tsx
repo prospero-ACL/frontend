@@ -8,7 +8,7 @@ export function ProtectedRouteIsLoggedIn({ children }: { children: React.ReactNo
     return <div>Loading...</div>;
   }
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" />;
   }
   return children;
 }
@@ -20,7 +20,7 @@ export function ProtectedRouteIsLoggedOut({ children }: { children: React.ReactN
     return <div>Loading...</div>;
   }
   if (isAuthenticated) {
-    return <Navigate to="/app" replace />;
+    return <Navigate to="/app" />;
   }
   return children;
 }
