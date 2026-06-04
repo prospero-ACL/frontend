@@ -8,12 +8,14 @@ export default function Navbar() {
       <NavLink
         href="/app"
         label="Chat with LLM"
+        description="The main app"
         leftSection={<HouseIcon size={16} />}
         active={!!useMatch('/app')}
       />
       <NavLink
         href="/app/profile"
         label="With right section"
+        description="User profile and authorization"
         leftSection={<GaugeIcon size={16} />}
         active={!!useMatch('/app/profile')}
       />
