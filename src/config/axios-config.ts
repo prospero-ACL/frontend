@@ -55,9 +55,7 @@ const axiosBaseQuery =
         params,
         headers,
       });
-      // result is already response.data
-      // because of the interceptor
-      return { data: result };
+      return { data: result.data };
     } catch (axiosError) {
       const err = axiosError as AxiosError;
 
