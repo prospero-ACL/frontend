@@ -28,8 +28,10 @@ const api = createApi({
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
+        } finally {
           dispatch(resetUser());
-        } catch (error) {}
+          dispatch(api.util.resetApiState());
+        }
       },
     }),
     uploadUserDocument: builder.mutation<void, UploadDocument>({
