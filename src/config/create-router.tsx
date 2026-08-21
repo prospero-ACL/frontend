@@ -1,9 +1,9 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { MainApp } from '@/pages/main-app/page';
 import { HomePage } from '../pages/Home.page';
-import Chat from '../pages/main-app/components/chat';
-import Profile from '../pages/main-app/components/profile';
-import Docs from '../pages/main-app/modules/docs';
+import Chat from '../pages/main-app/modules/chat';
+import Documents from '../pages/main-app/modules/documents';
+import Profile from '../pages/main-app/modules/profile';
 import { ProtectedRouteIsLoggedIn, ProtectedRouteIsLoggedOut } from './route-protection';
 
 export const router = createBrowserRouter([
@@ -32,8 +32,8 @@ export const router = createBrowserRouter([
         element: <Profile />,
       },
       {
-        path: 'docs',
-        element: <Docs />,
+        path: 'documents',
+        element: <Documents />,
       },
     ],
   },

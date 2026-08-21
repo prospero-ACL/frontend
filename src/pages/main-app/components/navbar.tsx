@@ -23,11 +23,11 @@ export default function Navbar() {
       />
       <NavLink
         component={Link}
-        to="/app/docs"
+        to="/app/documents"
         label="Documents"
         description="Add or remove documents"
         leftSection={<ProhibitIcon size={16} />}
-        active={!!useMatch('/app/docs')}
+        active={!!useMatch('/app/documents')}
       />
     </>
   );

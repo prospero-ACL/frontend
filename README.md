@@ -9,6 +9,16 @@ This template comes with the following features:
 - [Vitest](https://vitest.dev/) setup with [React Testing Library](https://testing-library.com/docs/react-testing-library/intro)
 - Oxlint setup for TypeScript and React sources
 
+## App structure
+
+- `/` – logged-out welcome page with a login button
+- `/app` – logged-in shell (`src/pages/main-app/page.tsx`), with:
+  - `/app` (index) – chat for report creation
+  - `/app/profile` – user profile
+  - `/app/documents` – document upload/management
+
+Each `/app` sub-route is a self-contained feature module under `src/pages/main-app/modules/` (own `index.tsx`, `components/`, `hooks/`).
+
 ## npm scripts
 
 ## Build and dev scripts
