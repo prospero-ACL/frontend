@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import api from '@/config/api';
 import { useAppSelector } from '@/config/store';
-import { Document, UploadDocument } from '@/shared/dto/document';
+import { Document, DocumentScope, UploadDocument } from '@/shared/dto/document';
 import { extractTextFromPdf } from '@/shared/utils/pdf-parser';
 
 export function useDocs() {
@@ -17,21 +17,17 @@ export function useDocs() {
   const docs = data || [];
   const [isPdfInputLoading, setIsPdfInputLoading] = useState(false);
 
-  async function handleFile(file: File | null) {
-    if (!file) return;
+  async function handleUpload(file: File, scope: DocumentScope) {
     setIsPdfInputLoading(true);
-    console.log('file from use state', file);
     try {
       const extractedText = await extractTextFromPdf(file);
       const payload: UploadDocument = {
         name: file.name,
         text: extractedText,
         userId: user!.id,
+        scope,
       };
-      console.log('payload', payload);
-      uploadText(payload);
-    } catch (error) {
-      console.error(error);
+      await uploadText(payload).unwrap();
     } finally {
       setIsPdfInputLoading(false);
     }
@@ -41,6 +37,6 @@ export function useDocs() {
     docs,
     isLoading,
     dummyDocs,
-    handleFile,
+    handleUpload,
   };
 }

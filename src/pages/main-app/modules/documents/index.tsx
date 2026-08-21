@@ -1,22 +1,20 @@
-import { Button, FileButton, Text } from '@mantine/core';
+import { Button, Text } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import Table from './components/table';
+import UploadModal from './components/upload-modal';
 import { useDocs } from './hooks/use-docs';
 
 export default function Docs() {
-  const { dummyDocs, handleFile, isLoading, docs } = useDocs();
+  const { handleUpload, isLoading, docs } = useDocs();
+  const [opened, { open, close }] = useDisclosure(false);
+
   console.log('docs', docs);
   return (
     <>
       <Text>Docs</Text>
-      <Table userDocs={dummyDocs} />
       <Table userDocs={docs} />
-      <FileButton onChange={handleFile} accept="application/pdf">
-        {(props) => (
-          <Button loading={isLoading} disabled={isLoading} {...props}>
-            Upload document
-          </Button>
-        )}
-      </FileButton>
+      <Button onClick={open}>Upload document</Button>
+      <UploadModal opened={opened} onClose={close} onSubmit={handleUpload} isLoading={isLoading} />
     </>
   );
 }
