@@ -3,7 +3,7 @@ import type { OxlintConfig } from 'oxlint';
 export default {
   plugins: ['react', 'typescript', 'jsx-a11y', 'jest'],
 
-  ignorePatterns: ['**/*.{mjs,cjs,js,d.ts,d.mts}', 'dist', 'storybook-static'],
+  ignorePatterns: ['**/*.{mjs,cjs,js,d.ts,d.mts}', 'dist'],
 
   rules: {
     'array-callback-return': 'error',
@@ -92,14 +92,4 @@ export default {
     'jest/no-export': 'off',
     'jest/valid-title': 'off',
   },
-
-  overrides: [
-    {
-      files: ['**/*.story.tsx'],
-      rules: {
-        'no-console': 'off',
-        'react/button-has-type': 'off',
-      },
-    },
-  ],
 } satisfies OxlintConfig;

@@ -8,9 +8,9 @@ React 19 + TypeScript SPA (Vite, Mantine 9 UI) — the frontend for an ESD thesi
 
 ## Commands
 
-Package manager is **Yarn 4** (`yarn@4.14.1`, Corepack/`.yarn/releases`), but `package.json` scripts and CI invoke each other via `npm run`. Use `yarn` to install, `npm run <script>` to run scripts (matches existing scripts/CI).
+Package manager is **npm**. Use `npm install` to install, `npm run <script>` to run scripts (matches existing scripts/CI).
 
-- `yarn` — install dependencies
+- `npm install` — install dependencies
 - `npm run dev` — start Vite dev server (port 5173)
 - `npm run build` — `tsc` then `vite build` (type errors fail the build)
 - `npm run typecheck` — `tsc --noEmit`
@@ -19,9 +19,8 @@ Package manager is **Yarn 4** (`yarn@4.14.1`, Corepack/`.yarn/releases`), but `p
 - `npm run vitest` / `npm run vitest:watch` — run/watch unit tests (Vitest + jsdom + RTL)
 - `npm test` — full gate: typecheck → format:test → lint → vitest → build (this is what CI runs, minus install)
 - Single test file: `npx vitest run path/to/File.test.tsx`
-- `npm run storybook` / `npm run storybook:build` — Storybook dev server / static build
 
-CI (`.github/workflows/npm_test.yml`) runs on every PR: install with yarn, then `npm run build` and `npm test`.
+CI (`.github/workflows/npm_test.yml`) runs on every PR: install with npm, then `npm run build` and `npm test`.
 
 Pre-commit hooks (`.pre-commit-config.yaml`, install via `pre-commit`) run `tsc`, then lint and format (`scripts/pre-commit-lint.sh`, `scripts/pre-commit-format.sh`) on staged `.ts`/`.tsx`/`.json` files only, auto-fixing and re-staging format issues.
 

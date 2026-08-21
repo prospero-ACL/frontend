@@ -16,5 +16,5 @@ fi
 
 echo "Linting files: ${changed_files[*]}"
 
-# Now run ESLint (or use npm run lint -- if that accepts file args).
+# Now run oxlint (via the lint:file script) with the file args.
 npm run lint:file -- "${changed_files[@]}"
