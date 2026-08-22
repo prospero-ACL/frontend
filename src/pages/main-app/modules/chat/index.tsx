@@ -1,12 +1,15 @@
-import { Group, Stack, Text, Button, Textarea, Modal } from '@mantine/core';
+import { Group, Stack, Text, Button, Textarea, Modal, LoadingOverlay } from '@mantine/core';
+import { useAppSelector } from '@/config/store';
 import useChat from './hooks/use-chat';
 
 export default function Chat() {
   const { openDocumentsModal, closeDocumentsModal, isDocumentsModalOpen } = useChat();
+  const isLoading = useAppSelector((state) => state.loading.isLoading);
 
   return (
     <>
-      <Stack p="sm">
+      <Stack p="sm" pos="relative">
+        <LoadingOverlay visible={isLoading} />
         <Text>Welcome to Prospero ACL, a RAG system</Text>
         <Text>Click the button to start an new Report creation</Text>
 

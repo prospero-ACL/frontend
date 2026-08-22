@@ -1,4 +1,13 @@
-import { Button, FileButton, Group, Modal, Slider, Stack, Text } from '@mantine/core';
+import {
+  LoadingOverlay,
+  Button,
+  FileButton,
+  Group,
+  Modal,
+  Slider,
+  Stack,
+  Text,
+} from '@mantine/core';
 import { DocumentScope } from '@/shared/dto/document';
 import { scopeMarks, useUploadModal } from '../hooks/use-upload-modal';
 
@@ -9,7 +18,7 @@ export type UploadModalProps = {
   isLoading: boolean;
 };
 
-export default function UploadModal({ opened, onClose, onSubmit, isLoading }: UploadModalProps) {
+export default function UploadModal({ isLoading, opened, onClose, onSubmit }: UploadModalProps) {
   const {
     selectedFile,
     setSelectedFile,
@@ -22,7 +31,8 @@ export default function UploadModal({ opened, onClose, onSubmit, isLoading }: Up
 
   return (
     <Modal opened={opened} onClose={handleClose} title="Upload document" centered>
-      <Stack gap="md" h={200} justify="space-evenly" align="center">
+      <Stack gap="md" h={200} justify="space-evenly" align="center" pos="relative">
+        <LoadingOverlay visible={isLoading} />
         <Slider
           miw={200}
           min={0}
@@ -46,7 +56,7 @@ export default function UploadModal({ opened, onClose, onSubmit, isLoading }: Up
           </Text>
         )}
         <Group justify="flex-end">
-          <Button onClick={handleSubmit} disabled={!selectedFile || isLoading} loading={isLoading}>
+          <Button onClick={handleSubmit} disabled={!selectedFile}>
             OK
           </Button>
           <Button variant="default" onClick={handleClose}>

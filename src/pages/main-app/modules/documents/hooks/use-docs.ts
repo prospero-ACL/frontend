@@ -1,11 +1,13 @@
 import { useDisclosure } from '@mantine/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '@/config/api';
-import { useAppSelector } from '@/config/store';
+import { setGlobalLoading } from '@/config/reducers/loading.reducer';
+import { useAppDispatch, useAppSelector } from '@/config/store';
 import { DocumentScope, UploadDocument } from '@/shared/dto/document';
 
 export function useDocs() {
   const user = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
 
   const [uploadText] = api.useUploadUserDocumentMutation();
   const { data, isLoading: isGetDocsLoading } = api.useGetUserDocumentsQuery(user!.id);
@@ -28,9 +30,19 @@ export function useDocs() {
     }
   }
   const isLoading = isPdfInputLoading || isGetDocsLoading;
+
+  useEffect(() => {
+    dispatch(setGlobalLoading(isLoading));
+  }, [isLoading, dispatch]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(setGlobalLoading(false));
+    };
+  }, [dispatch]);
+
   return {
     docs,
-    isLoading,
     handleUpload,
     isUploadModalOpened,
     openUploadModal,
