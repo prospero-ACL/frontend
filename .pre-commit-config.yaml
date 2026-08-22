@@ -20,3 +20,4 @@ repos:
         entry: ./scripts/pre-commit-format.sh
         language: script
         pass_filenames: true
+        require_serial: true # entry ends with `git add`; parallel shards race on .git/index.lock

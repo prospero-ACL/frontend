@@ -3,6 +3,7 @@ import z from 'zod';
 export const documentScopeSchema = z.enum(['PUBLIC', 'RESTRICTED', 'ELEVATED']);
 
 export const documentSchema = z.object({
+  id: z.uuid(),
   name: z.string(),
   uploadedAt: z.string(),
 });

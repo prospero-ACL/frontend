@@ -1,4 +1,5 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
+import { Report, ReportCreateRequest } from '@/shared/dto/chat';
 import { UploadDocument, Document } from '@/shared/dto/document';
 import { User, userSchema } from '@/shared/dto/user';
 import axiosBaseQuery from './axios-config';
@@ -7,7 +8,7 @@ import { resetUser } from './reducers/auth.reducer';
 const api = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['Auth', 'Docs'],
+  tagTypes: ['Auth', 'Docs', 'Reports'],
   endpoints: (builder) => ({
     getUserMe: builder.query<User | null, void>({
       query: () => ({
@@ -55,6 +56,37 @@ const api = createApi({
         method: 'GET',
       }),
       providesTags: ['Docs'],
+    }),
+    createReport: builder.mutation<Report, ReportCreateRequest>({
+      query: (body) => ({
+        url: '/conversations/create',
+        method: 'POST',
+        data: body,
+      }),
+      invalidatesTags: ['Reports'],
+    }),
+    continueReport: builder.mutation<Report, { reportId: string; prompt: string }>({
+      query: ({ reportId, prompt }) => ({
+        url: `/conversations/${reportId}/continue`,
+        method: 'POST',
+        data: { prompt },
+      }),
+      invalidatesTags: ['Reports'],
+    }),
+    getReport: builder.query<Report, string>({
+      query: (reportId) => ({
+        url: `/conversations/${reportId}`,
+        method: 'GET',
+      }),
+      providesTags: ['Reports'],
+    }),
+    getDraftReport: builder.query<Report | null, void>({
+      query: () => ({
+        url: '/conversations/draft',
+        method: 'GET',
+      }),
+      transformResponse: (data: unknown) => (data ? (data as Report) : null),
+      providesTags: ['Reports'],
     }),
   }),
 });

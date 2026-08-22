@@ -20,7 +20,7 @@ import { onBootStrap } from './reducers/auth.reducer';
 const rootPersistConfig = {
   key: 'root',
   storage,
-  whitelist: ['app'],
+  whitelist: ['app', 'report'],
   blacklist: [api.reducerPath],
 };
 
