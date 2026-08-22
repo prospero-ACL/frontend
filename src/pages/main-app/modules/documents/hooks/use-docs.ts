@@ -1,3 +1,4 @@
+import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
 import api from '@/config/api';
 import { useAppSelector } from '@/config/store';
@@ -15,6 +16,8 @@ export function useDocs() {
   const { data, isLoading: isGetDocsLoading } = api.useGetUserDocumentsQuery(user!.id);
   const docs = data || [];
   const [isPdfInputLoading, setIsPdfInputLoading] = useState(false);
+  const [isUploadModalOpened, { open: openUploadModal, close: closeUploadModal }] =
+    useDisclosure(false);
 
   async function handleUpload(file: File, scope: DocumentScope) {
     setIsPdfInputLoading(true);
@@ -35,5 +38,8 @@ export function useDocs() {
     isLoading,
     dummyDocs,
     handleUpload,
+    isUploadModalOpened,
+    openUploadModal,
+    closeUploadModal,
   };
 }

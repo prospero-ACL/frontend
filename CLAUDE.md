@@ -39,12 +39,13 @@ Pre-commit hooks (`.pre-commit-config.yaml`, install via `pre-commit`) run `tsc`
 
 **Shared types/DTOs** (`src/shared/dto/`): zod schemas paired with inferred TS types (`z.infer`), used both for RTK Query `dataSchema` validation and as the canonical types across the app. Prefer extending/adding a zod schema (and inferring the type from it) over hand-writing a separate interface.
 
-**Path aliases**: `@/*` → `./src/*`, `@test-utils` → `./test-utils` (defined in `tsconfig.json`; Vite resolves via `resolve.tsconfigPaths`). The codebase is inconsistent about using the alias vs. relative imports — prefer `@/` for new code.
+**Path aliases**: `@/*` → `./src/*`, `@test-utils` → `./test-utils` (defined in `tsconfig.json`). Vite resolves `@test-utils` via `resolve.tsconfigPaths`, and resolves `@` explicitly via `resolve.alias` in `vite.config.mjs` (`'@': path.resolve(__dirname, './src')`). The codebase is inconsistent about using the alias vs. relative imports — prefer `@/` for new code, and use it for all new imports going forward.
 
 **Theming**: Mantine `MantineProvider` in `src/App.tsx` with `defaultColorScheme="auto"` and theme overrides in `src/config/theme.ts`; `ColorSchemeToggle` component reads/writes scheme.
 
 ## Conventions
 
+- **`.tsx` files are for JSX/markup only; `.ts` files (hooks) hold logic.** State, side effects, event handlers, and plain helper functions belong in a `use-*.ts` hook (or a co-located `.ts` helper), not inline in a component. A component destructures what it needs from its hook and renders it. This applies to state and business logic — data fetching, mutations, form/modal state, computed values, handlers — not to a single trivial library hook call whose return value is used directly in JSX (e.g. a lone `useMatch(...)` for an `active` prop). When in doubt, prefer moving it out. Every module's `hooks/` directory follows this; the shell (`Main.page.tsx`) has its own `hooks/use-main-app.ts` for the same reason.
 - Import order is enforced by oxfmt (`.oxfmtrc.json`): side-effect/style imports, then external, then internal (`@/...`), then relative, then style, then unknown — no blank lines between groups. Run `npm run format:write` rather than hand-ordering imports.
 - Single quotes, 100-char print width, ES5 trailing commas (oxfmt).
 - CSS uses `stylelint-config-standard-scss` with several rules disabled — see `.stylelintrc.json` before assuming a stricter default ruleset.

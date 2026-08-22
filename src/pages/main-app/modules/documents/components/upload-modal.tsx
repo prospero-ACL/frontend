@@ -1,20 +1,6 @@
 import { Button, FileButton, Group, Modal, Slider, Stack, Text } from '@mantine/core';
-import { useState } from 'react';
 import { DocumentScope } from '@/shared/dto/document';
-
-const scopeMarks: Array<{ value: number; label: DocumentScope }> = [
-  { value: 0, label: 'PUBLIC' },
-  { value: 50, label: 'RESTRICTED' },
-  { value: 100, label: 'ELEVATED' },
-];
-
-function scopeToValue(scope: DocumentScope) {
-  return scopeMarks.find((mark) => mark.label === scope)!.value;
-}
-
-function valueToScope(value: number) {
-  return scopeMarks.find((mark) => mark.value === value)!.label;
-}
+import { scopeMarks, useUploadModal } from '../hooks/use-upload-modal';
 
 export type UploadModalProps = {
   opened: boolean;
@@ -24,29 +10,15 @@ export type UploadModalProps = {
 };
 
 export default function UploadModal({ opened, onClose, onSubmit, isLoading }: UploadModalProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [scope, setScope] = useState<DocumentScope>('PUBLIC');
-  const [error, setError] = useState<string | null>(null);
-
-  const handleClose = () => {
-    setSelectedFile(null);
-    setScope('PUBLIC');
-    setError(null);
-    onClose();
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedFile) {
-      return;
-    }
-    setError(null);
-    try {
-      await onSubmit(selectedFile, scope);
-      handleClose();
-    } catch {
-      setError('Upload failed. Please try again.');
-    }
-  };
+  const {
+    selectedFile,
+    setSelectedFile,
+    scopeValue,
+    error,
+    handleClose,
+    handleSubmit,
+    handleScopeChange,
+  } = useUploadModal({ onSubmit, onClose });
 
   return (
     <Modal opened={opened} onClose={handleClose} title="Upload document" centered>
@@ -58,9 +30,9 @@ export default function UploadModal({ opened, onClose, onSubmit, isLoading }: Up
           step={50}
           restrictToMarks
           marks={scopeMarks}
-          value={scopeToValue(scope)}
-          onChange={(value) => setScope(valueToScope(value))}
-          label={(value) => valueToScope(value).toLowerCase()}
+          value={scopeValue}
+          onChange={handleScopeChange}
+          label={(value) => scopeMarks.find((mark) => mark.value === value)!.label.toLowerCase()}
         />
         <Group>
           <FileButton onChange={setSelectedFile} accept="application/pdf">
