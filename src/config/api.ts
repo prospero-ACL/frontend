@@ -35,11 +35,18 @@ const api = createApi({
       },
     }),
     uploadUserDocument: builder.mutation<void, UploadDocument>({
-      query: (body) => ({
-        url: '/documents',
-        method: 'POST',
-        data: body,
-      }),
+      query: ({ file, userId, scope }) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('userId', userId);
+        formData.append('scope', scope);
+        return {
+          url: '/documents',
+          method: 'POST',
+          data: formData,
+          headers: { 'Content-Type': undefined },
+        };
+      },
       invalidatesTags: ['Docs'],
     }),
     getUserDocuments: builder.query<Array<Document>, string>({

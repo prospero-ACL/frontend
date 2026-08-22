@@ -2,7 +2,6 @@ import { useState } from 'react';
 import api from '@/config/api';
 import { useAppSelector } from '@/config/store';
 import { Document, DocumentScope, UploadDocument } from '@/shared/dto/document';
-import { extractTextFromPdf } from '@/shared/utils/pdf-parser';
 
 export function useDocs() {
   const dummyDocs: Array<Document> = [
@@ -20,10 +19,8 @@ export function useDocs() {
   async function handleUpload(file: File, scope: DocumentScope) {
     setIsPdfInputLoading(true);
     try {
-      const extractedText = await extractTextFromPdf(file);
       const payload: UploadDocument = {
-        name: file.name,
-        text: extractedText,
+        file,
         userId: user!.id,
         scope,
       };

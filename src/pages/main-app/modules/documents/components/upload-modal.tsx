@@ -50,7 +50,7 @@ export default function UploadModal({ opened, onClose, onSubmit, isLoading }: Up
 
   return (
     <Modal opened={opened} onClose={handleClose} title="Upload document" centered>
-      <Stack>
+      <Stack gap="md">
         <Slider
           min={0}
           max={100}
@@ -59,7 +59,7 @@ export default function UploadModal({ opened, onClose, onSubmit, isLoading }: Up
           marks={scopeMarks}
           value={scopeToValue(scope)}
           onChange={(value) => setScope(valueToScope(value))}
-          label={(value) => valueToScope(value)}
+          label={(value) => valueToScope(value).toLowerCase()}
         />
         <Group>
           <FileButton onChange={setSelectedFile} accept="application/pdf">

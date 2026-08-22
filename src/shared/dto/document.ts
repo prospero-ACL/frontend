@@ -8,8 +8,7 @@ export const documentSchema = z.object({
 });
 
 export const uploadDocumentSchema = z.object({
-  name: z.string(),
-  text: z.string(),
+  file: z.instanceof(File),
   userId: z.string(),
   scope: documentScopeSchema,
 });
