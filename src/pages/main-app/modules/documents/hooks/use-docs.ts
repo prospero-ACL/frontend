@@ -2,14 +2,9 @@ import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
 import api from '@/config/api';
 import { useAppSelector } from '@/config/store';
-import { Document, DocumentScope, UploadDocument } from '@/shared/dto/document';
+import { DocumentScope, UploadDocument } from '@/shared/dto/document';
 
 export function useDocs() {
-  const dummyDocs: Array<Document> = [
-    { name: 'test', uploadedAt: '2010-12-11' },
-    { name: 'test1', uploadedAt: '2010-12-12' },
-    { name: 'test2', uploadedAt: '2020-12-12' },
-  ];
   const user = useAppSelector((state) => state.auth.user);
 
   const [uploadText] = api.useUploadUserDocumentMutation();
@@ -36,7 +31,6 @@ export function useDocs() {
   return {
     docs,
     isLoading,
-    dummyDocs,
     handleUpload,
     isUploadModalOpened,
     openUploadModal,

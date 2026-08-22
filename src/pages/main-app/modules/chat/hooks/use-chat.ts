@@ -1,3 +1,4 @@
+import { useDisclosure } from '@mantine/hooks';
 import { KeyboardEvent, useState } from 'react';
 import { ChatMessage } from '@/shared/dto/chat';
 
@@ -21,7 +22,13 @@ export default function useChat() {
     }
   }
 
+  const [isDocumentsModalOpen, { open: openDocumentsModal, close: closeDocumentsModal }] =
+    useDisclosure(false);
+
   return {
+    isDocumentsModalOpen,
+    openDocumentsModal,
+    closeDocumentsModal,
     messages,
     input,
     setInput,
