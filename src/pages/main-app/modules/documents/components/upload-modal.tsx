@@ -50,8 +50,9 @@ export default function UploadModal({ opened, onClose, onSubmit, isLoading }: Up
 
   return (
     <Modal opened={opened} onClose={handleClose} title="Upload document" centered>
-      <Stack gap="md">
+      <Stack gap="md" h={200} justify="space-evenly" align="center">
         <Slider
+          miw={200}
           min={0}
           max={100}
           step={50}
@@ -73,11 +74,11 @@ export default function UploadModal({ opened, onClose, onSubmit, isLoading }: Up
           </Text>
         )}
         <Group justify="flex-end">
-          <Button variant="default" onClick={handleClose}>
-            Cancel
-          </Button>
           <Button onClick={handleSubmit} disabled={!selectedFile || isLoading} loading={isLoading}>
             OK
+          </Button>
+          <Button variant="default" onClick={handleClose}>
+            Cancel
           </Button>
         </Group>
       </Stack>
