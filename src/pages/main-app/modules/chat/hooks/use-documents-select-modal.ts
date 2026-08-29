@@ -1,4 +1,8 @@
-import { useState } from 'react';
+import { useForm } from '@mantine/form';
+
+export type DocumentsSelectFormValues = {
+  selectedIds: Record<string, boolean>;
+};
 
 export type UseDocumentsSelectModalArgs = {
   onConfirm: (documentIds: Array<string>) => void;
@@ -6,33 +10,27 @@ export type UseDocumentsSelectModalArgs = {
 };
 
 export function useDocumentsSelectModal({ onConfirm, onClose }: UseDocumentsSelectModalArgs) {
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const form = useForm<DocumentsSelectFormValues>({
+    initialValues: { selectedIds: {} },
+  });
 
-  function toggleDocument(id: string) {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  }
+  const selectedIds = Object.entries(form.values.selectedIds)
+    .filter(([, checked]) => checked)
+    .map(([id]) => id);
 
   function handleClose() {
-    setSelectedIds(new Set());
+    form.reset();
     onClose();
   }
 
   function handleConfirm() {
-    onConfirm(Array.from(selectedIds));
+    onConfirm(selectedIds);
     handleClose();
   }
 
   return {
+    form,
     selectedIds,
-    toggleDocument,
     handleClose,
     handleConfirm,
   };

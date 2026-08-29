@@ -1,18 +1,15 @@
 import { Table } from '@mantine/core';
+import { UseFormReturnType } from '@mantine/form';
 import { Document } from '@/shared/dto/document';
+import { DocumentsSelectFormValues } from '../hooks/use-documents-select-modal';
 import DocumentsSelectTableRow from './documents-select-table-row';
 
 export type DocumentsSelectTableProps = {
   documents: Array<Document>;
-  selectedIds: Set<string>;
-  onToggle: (id: string) => void;
+  form: UseFormReturnType<DocumentsSelectFormValues>;
 };
 
-export default function DocumentsSelectTable({
-  documents,
-  selectedIds,
-  onToggle,
-}: DocumentsSelectTableProps) {
+export default function DocumentsSelectTable({ documents, form }: DocumentsSelectTableProps) {
   return (
     <Table.ScrollContainer minWidth={500} maxHeight={300}>
       <Table>
@@ -25,12 +22,7 @@ export default function DocumentsSelectTable({
         </Table.Thead>
         <Table.Tbody>
           {documents.map((doc) => (
-            <DocumentsSelectTableRow
-              key={doc.id}
-              doc={doc}
-              checked={selectedIds.has(doc.id)}
-              onToggle={onToggle}
-            />
+            <DocumentsSelectTableRow key={doc.id} doc={doc} form={form} />
           ))}
         </Table.Tbody>
       </Table>

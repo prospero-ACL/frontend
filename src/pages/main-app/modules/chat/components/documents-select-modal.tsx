@@ -16,20 +16,16 @@ export default function DocumentsSelectModal({
   onConfirm,
   documents,
 }: DocumentsSelectModalProps) {
-  const { selectedIds, toggleDocument, handleClose, handleConfirm } = useDocumentsSelectModal({
+  const { form, selectedIds, handleClose, handleConfirm } = useDocumentsSelectModal({
     onConfirm,
     onClose,
   });
 
   return (
     <Modal opened={opened} onClose={handleClose} title="Select documents" centered>
-      <DocumentsSelectTable
-        documents={documents}
-        selectedIds={selectedIds}
-        onToggle={toggleDocument}
-      />
+      <DocumentsSelectTable documents={documents} form={form} />
       <Group justify="flex-end" mt="md">
-        <Button onClick={handleConfirm} disabled={selectedIds.size === 0}>
+        <Button onClick={handleConfirm} disabled={selectedIds.length === 0}>
           OK
         </Button>
         <Button variant="default" onClick={handleClose}>
