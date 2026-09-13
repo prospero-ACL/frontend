@@ -1,6 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { Report, ReportCreateRequest } from '@/shared/dto/chat';
 import { UploadDocument, Document } from '@/shared/dto/document';
+import { SecurityLevelResponse } from '@/shared/dto/security-level';
 import { User, userSchema } from '@/shared/dto/user';
 import axiosBaseQuery from './axios-config';
 import { resetUser } from './reducers/auth.reducer';
@@ -56,6 +57,21 @@ const api = createApi({
         method: 'GET',
       }),
       providesTags: ['Docs'],
+    }),
+    getSecurityLevel: builder.query<SecurityLevelResponse, void>({
+      query: () => ({
+        url: '/me/security-level',
+        method: 'GET',
+      }),
+      providesTags: ['Auth'],
+    }),
+    updateSecurityLevel: builder.mutation<void, SecurityLevelResponse>({
+      query: (body) => ({
+        url: '/me/security-level',
+        method: 'POST',
+        data: body,
+      }),
+      invalidatesTags: ['Auth'],
     }),
     createReport: builder.mutation<Report, ReportCreateRequest>({
       query: (body) => ({

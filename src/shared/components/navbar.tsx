@@ -16,7 +16,7 @@ export default function Navbar() {
       <NavLink
         component={Link}
         to="/app/profile"
-        label="With right section"
+        label="User Profile"
         description="User profile and authorization"
         leftSection={<GaugeIcon size={16} />}
         active={!!useMatch('/app/profile')}
