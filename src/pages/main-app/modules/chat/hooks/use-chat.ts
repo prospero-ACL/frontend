@@ -23,7 +23,6 @@ function toErrorMessage(err: unknown): string {
 export default function useChat() {
   const dispatch = useAppDispatch();
   const persistedId = useAppSelector((state) => state.report.id);
-  const user = useAppSelector((state) => state.auth.user);
 
   const [report, setReport] = useState<Report | null>(null);
   const [hasStartedReport, setHasStartedReport] = useState(false);
@@ -69,7 +68,7 @@ export default function useChat() {
   const [isDocumentsModalOpen, { open: openDocumentsModal, close: closeDocumentsModal }] =
     useDisclosure(false);
   const { data: userDocumentsData, isFetching: isDocsFetching } = api.useGetUserDocumentsQuery(
-    user!.id,
+    undefined,
     { skip: !isDocumentsModalOpen }
   );
   const userDocuments = userDocumentsData ?? [];

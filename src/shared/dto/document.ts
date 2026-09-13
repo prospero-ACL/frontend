@@ -6,11 +6,12 @@ export const documentSchema = z.object({
   id: z.uuid(),
   name: z.string(),
   uploadedAt: z.string(),
+  scope: documentScopeSchema,
+  owner: z.string(),
 });
 
 export const uploadDocumentSchema = z.object({
   file: z.instanceof(File),
-  userId: z.string(),
   scope: documentScopeSchema,
 });
 

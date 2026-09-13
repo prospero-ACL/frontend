@@ -2,15 +2,14 @@ import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import api from '@/config/api';
 import { setGlobalLoading } from '@/config/reducers/loading.reducer';
-import { useAppDispatch, useAppSelector } from '@/config/store';
+import { useAppDispatch } from '@/config/store';
 import { DocumentScope, UploadDocument } from '@/shared/dto/document';
 
 export function useDocs() {
-  const user = useAppSelector((state) => state.auth.user);
   const dispatch = useAppDispatch();
 
   const [uploadText] = api.useUploadUserDocumentMutation();
-  const { data, isLoading: isGetDocsLoading } = api.useGetUserDocumentsQuery(user!.id);
+  const { data, isLoading: isGetDocsLoading } = api.useGetUserDocumentsQuery();
   const docs = data || [];
   const [isPdfInputLoading, setIsPdfInputLoading] = useState(false);
   const [isUploadModalOpened, { open: openUploadModal, close: closeUploadModal }] =
@@ -21,7 +20,6 @@ export function useDocs() {
     try {
       const payload: UploadDocument = {
         file,
-        userId: user!.id,
         scope,
       };
       await uploadText(payload).unwrap();

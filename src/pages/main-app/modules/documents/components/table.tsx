@@ -11,10 +11,11 @@ export default function DocsTable(props: DocsTableProps) {
       <Table>
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>#</Table.Th>
+            <Table.Th> </Table.Th>
             <Table.Th>Filename</Table.Th>
             <Table.Th>Uploaded at</Table.Th>
-            <Table.Th>Atomic mass</Table.Th>
+            <Table.Th>Scope</Table.Th>
+            <Table.Th>Owner</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>

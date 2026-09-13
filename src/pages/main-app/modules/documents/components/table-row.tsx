@@ -10,8 +10,10 @@ export default function TableRow(props: TableRowProps) {
 
   return (
     <Table.Tr key={userDoc.name}>
-      <Table.Td>{position}</Table.Td>
+      <Table.Td>{position + 1}</Table.Td>
       <Table.Td>{userDoc.name}</Table.Td>
+      <Table.Td>{userDoc.scope}</Table.Td>
+      <Table.Td>{userDoc.owner}</Table.Td>
       <Table.Td>{userDoc.uploadedAt.toLocaleString()}</Table.Td>
     </Table.Tr>
   );

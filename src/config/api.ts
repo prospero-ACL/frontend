@@ -37,10 +37,9 @@ const api = createApi({
       },
     }),
     uploadUserDocument: builder.mutation<void, UploadDocument>({
-      query: ({ file, userId, scope }) => {
+      query: ({ file, scope }) => {
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('userId', userId);
         formData.append('scope', scope);
         return {
           url: '/documents',
@@ -51,9 +50,9 @@ const api = createApi({
       },
       invalidatesTags: ['Docs'],
     }),
-    getUserDocuments: builder.query<Array<Document>, string>({
-      query: (userId) => ({
-        url: `/documents/${userId}`,
+    getUserDocuments: builder.query<Array<Document>, void>({
+      query: () => ({
+        url: '/documents',
         method: 'GET',
       }),
       providesTags: ['Docs'],
