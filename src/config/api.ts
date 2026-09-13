@@ -9,7 +9,7 @@ import { resetUser } from './reducers/auth.reducer';
 const api = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['Auth', 'Docs', 'Reports'],
+  tagTypes: ['Auth', 'Docs', 'Reports', 'SecurityLevel'],
   endpoints: (builder) => ({
     getUserMe: builder.query<User | null, void>({
       query: () => ({
@@ -62,7 +62,7 @@ const api = createApi({
         url: '/me/security-level',
         method: 'GET',
       }),
-      providesTags: ['Auth'],
+      providesTags: ['SecurityLevel'],
     }),
     updateSecurityLevel: builder.mutation<void, SecurityLevelResponse>({
       query: (body) => ({
@@ -70,7 +70,7 @@ const api = createApi({
         method: 'POST',
         data: body,
       }),
-      invalidatesTags: ['Auth'],
+      invalidatesTags: ['SecurityLevel', 'Docs'],
     }),
     createReport: builder.mutation<Report, ReportCreateRequest>({
       query: (body) => ({
