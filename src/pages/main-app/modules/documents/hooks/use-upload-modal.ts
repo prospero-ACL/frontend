@@ -1,62 +1,72 @@
 import { useState } from 'react';
-import { DocumentScope } from '@/shared/dto/document';
+import { BOOK_POSITIONS, BookPosition, TrilogyUpload } from '@/shared/dto/document';
 
-export const scopeMarks: Array<{ value: number; label: DocumentScope }> = [
-  { value: 0, label: 'PUBLIC' },
-  { value: 50, label: 'RESTRICTED' },
-  { value: 100, label: 'ELEVATED' },
-];
+type BookFiles = Record<BookPosition, File | null>;
 
-function scopeToValue(scope: DocumentScope) {
-  return scopeMarks.find((mark) => mark.label === scope)!.value;
-}
+const EMPTY_BOOKS: BookFiles = { 1: null, 2: null, 3: null };
 
-function valueToScope(value: number) {
-  return scopeMarks.find((mark) => mark.value === value)!.label;
+function toErrorMessage(err: unknown): string {
+  if (err && typeof err === 'object' && 'status' in err) {
+    const { status, data } = err as { status?: number; data?: unknown };
+    if (status === 413) {
+      return 'The files are too large to upload.';
+    }
+    // 400 / 403 / 422 carry a human-readable reason from the backend
+    if (typeof data === 'string' && data.trim()) {
+      return data;
+    }
+  }
+  return 'Upload failed. Please try again.';
 }
 
 export type UseUploadModalArgs = {
-  onSubmit: (file: File, scope: DocumentScope) => Promise<void>;
+  onSubmit: (upload: TrilogyUpload) => Promise<void>;
   onClose: () => void;
 };
 
 export function useUploadModal({ onSubmit, onClose }: UseUploadModalArgs) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [scope, setScope] = useState<DocumentScope>('PUBLIC');
+  const [trilogyName, setTrilogyName] = useState('');
+  const [books, setBooks] = useState<BookFiles>(EMPTY_BOOKS);
   const [error, setError] = useState<string | null>(null);
 
+  const canSubmit =
+    trilogyName.trim().length > 0 && BOOK_POSITIONS.every((position) => books[position]);
+
+  function setBook(position: BookPosition, file: File | null) {
+    setBooks((current) => ({ ...current, [position]: file }));
+  }
+
   function handleClose() {
-    setSelectedFile(null);
-    setScope('PUBLIC');
+    setTrilogyName('');
+    setBooks(EMPTY_BOOKS);
     setError(null);
     onClose();
   }
 
   async function handleSubmit() {
-    if (!selectedFile) {
+    if (!canSubmit) {
       return;
     }
     setError(null);
     try {
-      await onSubmit(selectedFile, scope);
+      await onSubmit({
+        trilogyName: trilogyName.trim(),
+        books: BOOK_POSITIONS.map((position) => ({ position, file: books[position]! })),
+      });
       handleClose();
-    } catch {
-      setError('Upload failed. Please try again.');
+    } catch (err) {
+      setError(toErrorMessage(err));
     }
   }
 
-  function handleScopeChange(value: number) {
-    setScope(valueToScope(value));
-  }
-
   return {
-    selectedFile,
-    setSelectedFile,
-    scope,
-    scopeValue: scopeToValue(scope),
+    trilogyName,
+    setTrilogyName,
+    books,
+    setBook,
+    canSubmit,
     error,
     handleClose,
     handleSubmit,
-    handleScopeChange,
   };
 }

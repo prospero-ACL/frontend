@@ -1,5 +1,4 @@
 import z from 'zod';
-import { documentScopeSchema } from '@/shared/dto/document';
 
 export const chatRoleSchema = z.enum(['user', 'assistant']);
 
@@ -12,31 +11,26 @@ export const chatMessageSchema = z.object({
 export type ChatRole = z.infer<typeof chatRoleSchema>;
 export type ChatMessage = z.infer<typeof chatMessageSchema>;
 
-export const reportStatusSchema = z.enum(['DRAFT', 'IN_PROGRESS', 'COMPLETED']);
-export type ReportStatus = z.infer<typeof reportStatusSchema>;
-
-export const reportTurnSchema = z.object({
+export const conversationTurnSchema = z.object({
   position: z.number(),
   prompt: z.string(),
-  reply: z.string(),
+  // null when a prompt was stored without a reply; the backend pairs them by position
+  reply: z.string().nullable(),
 });
-export type ReportTurn = z.infer<typeof reportTurnSchema>;
+export type ConversationTurn = z.infer<typeof conversationTurnSchema>;
 
-export const reportSchema = z.object({
+export const conversationSchema = z.object({
   id: z.uuid(),
-  status: reportStatusSchema,
-  turns: z.array(reportTurnSchema),
+  turns: z.array(conversationTurnSchema),
 });
-export type Report = z.infer<typeof reportSchema>;
+export type Conversation = z.infer<typeof conversationSchema>;
 
-export const reportCreateRequestSchema = z.object({
-  prompt: z.string(),
-  scope: documentScopeSchema,
-  chunks: z.array(z.uuid()),
-});
-export type ReportCreateRequest = z.infer<typeof reportCreateRequestSchema>;
-
-export const reportContinueRequestSchema = z.object({
+export const conversationCreateRequestSchema = z.object({
   prompt: z.string(),
 });
-export type ReportContinueRequest = z.infer<typeof reportContinueRequestSchema>;
+export type ConversationCreateRequest = z.infer<typeof conversationCreateRequestSchema>;
+
+export const conversationContinueRequestSchema = z.object({
+  prompt: z.string(),
+});
+export type ConversationContinueRequest = z.infer<typeof conversationContinueRequestSchema>;

@@ -25,7 +25,7 @@ export default function Navbar() {
         component={Link}
         to="/app/documents"
         label="Documents"
-        description="Add or remove documents"
+        description="Trilogies in the knowledge base"
         leftSection={<ProhibitIcon size={16} />}
         active={!!useMatch('/app/documents')}
       />

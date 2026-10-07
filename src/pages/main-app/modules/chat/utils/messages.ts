@@ -1,21 +1,24 @@
-import { ChatMessage, Report } from '@/shared/dto/chat';
+import { ChatMessage, Conversation } from '@/shared/dto/chat';
 
 export const WELCOME_MESSAGE: ChatMessage = {
   id: 'welcome',
   role: 'assistant',
   content:
-    "Hi! I'm ready to help you build a report from your documents. Ask me anything to get started.",
+    "Hi! Ask me anything about the trilogies in the knowledge base. I'll answer from the books your clearance lets you read.",
 };
 
-export function buildMessages(
-  report: Report | null,
-  hasStartedReport: boolean
-): Array<ChatMessage> {
-  if (!report) {
-    return hasStartedReport ? [WELCOME_MESSAGE] : [];
+const MISSING_REPLY = 'No reply was recorded for this question.';
+
+export function buildMessages(conversation: Conversation | null): Array<ChatMessage> {
+  if (!conversation) {
+    return [WELCOME_MESSAGE];
   }
-  return report.turns.flatMap((turn) => [
+  return conversation.turns.flatMap((turn) => [
     { id: `${turn.position}-user`, role: 'user', content: turn.prompt } as ChatMessage,
-    { id: `${turn.position}-assistant`, role: 'assistant', content: turn.reply } as ChatMessage,
+    {
+      id: `${turn.position}-assistant`,
+      role: 'assistant',
+      content: turn.reply ?? MISSING_REPLY,
+    } as ChatMessage,
   ]);
 }

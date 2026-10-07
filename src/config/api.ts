@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { Report, ReportCreateRequest } from '@/shared/dto/chat';
-import { UploadDocument, Document } from '@/shared/dto/document';
+import { Conversation, ConversationCreateRequest } from '@/shared/dto/chat';
+import { IngestionJob, TrilogyUpload } from '@/shared/dto/document';
 import { SecurityLevelResponse } from '@/shared/dto/security-level';
 import { User, userSchema } from '@/shared/dto/user';
 import axiosBaseQuery from './axios-config';
@@ -9,7 +9,7 @@ import { resetUser } from './reducers/auth.reducer';
 const api = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['Auth', 'Docs', 'Reports', 'SecurityLevel'],
+  tagTypes: ['Auth', 'Docs', 'Conversations', 'SecurityLevel'],
   endpoints: (builder) => ({
     getUserMe: builder.query<User | null, void>({
       query: () => ({
@@ -36,11 +36,15 @@ const api = createApi({
         }
       },
     }),
-    uploadUserDocument: builder.mutation<void, UploadDocument>({
-      query: ({ file, scope }) => {
+    // Returns as soon as the job is queued (202); progress is read from getIngestion.
+    uploadTrilogy: builder.mutation<IngestionJob, TrilogyUpload>({
+      query: ({ trilogyName, books }) => {
         const formData = new FormData();
-        formData.append('file', file);
-        formData.append('scope', scope);
+        formData.append('trilogyName', trilogyName);
+        books.forEach(({ file, position }) => {
+          formData.append('files', file);
+          formData.append('positions', String(position));
+        });
         return {
           url: '/documents',
           method: 'POST',
@@ -48,9 +52,14 @@ const api = createApi({
           headers: { 'Content-Type': undefined },
         };
       },
-      invalidatesTags: ['Docs'],
     }),
-    getUserDocuments: builder.query<Array<Document>, void>({
+    getIngestion: builder.query<IngestionJob, string>({
+      query: (jobId) => ({
+        url: `/documents/ingestions/${jobId}`,
+        method: 'GET',
+      }),
+    }),
+    getTrilogies: builder.query<Array<string>, void>({
       query: () => ({
         url: '/documents',
         method: 'GET',
@@ -64,44 +73,40 @@ const api = createApi({
       }),
       providesTags: ['SecurityLevel'],
     }),
-    updateSecurityLevel: builder.mutation<void, SecurityLevelResponse>({
-      query: (body) => ({
-        url: '/me/security-level',
-        method: 'POST',
-        data: body,
-      }),
-      invalidatesTags: ['SecurityLevel', 'Docs'],
-    }),
-    createReport: builder.mutation<Report, ReportCreateRequest>({
+    createConversation: builder.mutation<Conversation, ConversationCreateRequest>({
       query: (body) => ({
         url: '/conversations/create',
         method: 'POST',
         data: body,
       }),
-      invalidatesTags: ['Reports'],
+      invalidatesTags: ['Conversations'],
     }),
-    continueReport: builder.mutation<Report, { reportId: string; prompt: string }>({
-      query: ({ reportId, prompt }) => ({
-        url: `/conversations/${reportId}/continue`,
+    continueConversation: builder.mutation<
+      Conversation,
+      { conversationId: string; prompt: string }
+    >({
+      query: ({ conversationId, prompt }) => ({
+        url: `/conversations/${conversationId}/continue`,
         method: 'POST',
         data: { prompt },
       }),
-      invalidatesTags: ['Reports'],
+      invalidatesTags: ['Conversations'],
     }),
-    getReport: builder.query<Report, string>({
-      query: (reportId) => ({
-        url: `/conversations/${reportId}`,
+    getConversation: builder.query<Conversation, string>({
+      query: (conversationId) => ({
+        url: `/conversations/${conversationId}`,
         method: 'GET',
       }),
-      providesTags: ['Reports'],
+      providesTags: ['Conversations'],
     }),
-    getDraftReport: builder.query<Report | null, void>({
+    // 204 (no conversation yet) arrives as an empty body, mapped to null.
+    getLatestConversation: builder.query<Conversation | null, void>({
       query: () => ({
-        url: '/conversations/draft',
+        url: '/conversations/latest',
         method: 'GET',
       }),
-      transformResponse: (data: unknown) => (data ? (data as Report) : null),
-      providesTags: ['Reports'],
+      transformResponse: (data: unknown) => (data ? (data as Conversation) : null),
+      providesTags: ['Conversations'],
     }),
   }),
 });

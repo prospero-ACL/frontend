@@ -1,26 +1,23 @@
 import { Table } from '@mantine/core';
-import { Document } from '@/shared/dto/document';
-import TableRow from './table-row';
 
-export type DocsTableProps = { userDocs: Array<Document> };
+export type TrilogiesTableProps = { trilogies: Array<string> };
 
-export default function DocsTable(props: DocsTableProps) {
-  const { userDocs } = props;
+export default function TrilogiesTable({ trilogies }: TrilogiesTableProps) {
   return (
     <Table.ScrollContainer minWidth={500} maxHeight={300}>
       <Table>
         <Table.Thead>
           <Table.Tr>
             <Table.Th> </Table.Th>
-            <Table.Th>Filename</Table.Th>
-            <Table.Th>Uploaded at</Table.Th>
-            <Table.Th>Scope</Table.Th>
-            <Table.Th>Owner</Table.Th>
+            <Table.Th>Trilogy</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {userDocs.map((userDoc) => (
-            <TableRow key={userDoc.name} position={userDocs.indexOf(userDoc)} userDoc={userDoc} />
+          {trilogies.map((trilogy, index) => (
+            <Table.Tr key={trilogy}>
+              <Table.Td>{index + 1}</Table.Td>
+              <Table.Td>{trilogy}</Table.Td>
+            </Table.Tr>
           ))}
         </Table.Tbody>
       </Table>

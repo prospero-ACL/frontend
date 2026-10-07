@@ -1,20 +1,30 @@
 import z from 'zod';
 
-export const documentScopeSchema = z.enum(['PUBLIC', 'RESTRICTED', 'ELEVATED']);
+export const BOOK_POSITIONS = [1, 2, 3] as const;
+export type BookPosition = (typeof BOOK_POSITIONS)[number];
 
-export const documentSchema = z.object({
+export const trilogyUploadSchema = z.object({
+  trilogyName: z.string().trim().min(1),
+  books: z
+    .array(z.object({ position: z.number(), file: z.instanceof(File) }))
+    .length(BOOK_POSITIONS.length),
+});
+export type TrilogyUpload = z.infer<typeof trilogyUploadSchema>;
+
+export const ingestionStatusSchema = z.enum(['PENDING', 'RUNNING', 'COMPLETED', 'FAILED']);
+export type IngestionStatus = z.infer<typeof ingestionStatusSchema>;
+
+export const ingestionJobSchema = z.object({
   id: z.uuid(),
-  name: z.string(),
-  uploadedAt: z.string(),
-  scope: documentScopeSchema,
-  owner: z.string(),
+  trilogy: z.string(),
+  status: ingestionStatusSchema,
+  booksDone: z.number(),
+  booksTotal: z.number(),
+  chunksWritten: z.number(),
+  error: z.string().nullable(),
 });
+export type IngestionJob = z.infer<typeof ingestionJobSchema>;
 
-export const uploadDocumentSchema = z.object({
-  file: z.instanceof(File),
-  scope: documentScopeSchema,
-});
-
-export type DocumentScope = z.infer<typeof documentScopeSchema>;
-export type UploadDocument = z.infer<typeof uploadDocumentSchema>;
-export type Document = z.infer<typeof documentSchema>;
+export function isIngestionFinished(job: IngestionJob) {
+  return job.status === 'COMPLETED' || job.status === 'FAILED';
+}

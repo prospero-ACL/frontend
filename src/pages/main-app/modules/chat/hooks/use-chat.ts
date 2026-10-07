@@ -1,20 +1,16 @@
-import { useDisclosure } from '@mantine/hooks';
 import { KeyboardEvent, useEffect, useState } from 'react';
 import api from '@/config/api';
+import { clearConversationId, setConversationId } from '@/config/reducers/conversation.reducer';
 import { setGlobalLoading } from '@/config/reducers/loading.reducer';
-import { clearReportId, setReportId } from '@/config/reducers/report.reducer';
 import { useAppDispatch, useAppSelector } from '@/config/store';
-import { Report } from '@/shared/dto/chat';
+import { Conversation } from '@/shared/dto/chat';
 import { buildMessages } from '../utils/messages';
 
 function toErrorMessage(err: unknown): string {
   if (err && typeof err === 'object' && 'status' in err) {
     const status = (err as { status?: number }).status;
-    if (status === 409) {
-      return 'This report has reached its 3-question limit.';
-    }
     if (status === 404) {
-      return 'This report could not be found. It may have been removed.';
+      return 'This conversation could not be found. It may have been removed.';
     }
   }
   return 'Something went wrong sending your message. Please try again.';
@@ -22,64 +18,54 @@ function toErrorMessage(err: unknown): string {
 
 export default function useChat() {
   const dispatch = useAppDispatch();
-  const persistedId = useAppSelector((state) => state.report.id);
+  const persistedId = useAppSelector((state) => state.conversation.id);
 
-  const [report, setReport] = useState<Report | null>(null);
-  const [hasStartedReport, setHasStartedReport] = useState(false);
-  const [pendingDocumentIds, setPendingDocumentIds] = useState<Array<string>>([]);
+  const [conversation, setConversation] = useState<Conversation | null>(null);
+  // Set when the user asks for a blank conversation, so the latest one is not re-adopted.
+  const [isStartingFresh, setIsStartingFresh] = useState(false);
   const [input, setInput] = useState('');
   const [sendError, setSendError] = useState<string | null>(null);
 
   const {
-    data: fetchedReport,
-    isFetching: isGetReportFetching,
-    isError: isGetReportError,
-  } = api.useGetReportQuery(persistedId ?? '', { skip: !persistedId });
+    data: fetchedConversation,
+    isFetching: isGetConversationFetching,
+    isError: isGetConversationError,
+  } = api.useGetConversationQuery(persistedId ?? '', { skip: !persistedId });
 
-  const { data: draftReport, isFetching: isDraftFetching } = api.useGetDraftReportQuery(undefined, {
-    skip: !!persistedId,
-  });
+  const { data: latestConversation, isFetching: isLatestFetching } =
+    api.useGetLatestConversationQuery(undefined, { skip: !!persistedId || isStartingFresh });
 
   useEffect(() => {
     if (!persistedId) {
       return;
     }
-    if (fetchedReport) {
-      if (fetchedReport.status === 'COMPLETED') {
-        dispatch(clearReportId());
-        setReport(null);
-      } else {
-        setReport(fetchedReport);
-      }
-    } else if (isGetReportError) {
-      dispatch(clearReportId());
-      setReport(null);
+    if (fetchedConversation) {
+      setConversation(fetchedConversation);
+    } else if (isGetConversationError) {
+      dispatch(clearConversationId());
+      setConversation(null);
     }
-  }, [persistedId, fetchedReport, isGetReportError, dispatch]);
+  }, [persistedId, fetchedConversation, isGetConversationError, dispatch]);
 
   useEffect(() => {
-    if (persistedId || !draftReport) {
+    if (persistedId || isStartingFresh || !latestConversation) {
       return;
     }
-    dispatch(setReportId(draftReport.id));
-    setReport(draftReport);
-  }, [persistedId, draftReport, dispatch]);
+    dispatch(setConversationId(latestConversation.id));
+    setConversation(latestConversation);
+  }, [persistedId, isStartingFresh, latestConversation, dispatch]);
 
-  const [isDocumentsModalOpen, { open: openDocumentsModal, close: closeDocumentsModal }] =
-    useDisclosure(false);
-  const { data: userDocumentsData, isFetching: isDocsFetching } = api.useGetUserDocumentsQuery(
-    undefined,
-    { skip: !isDocumentsModalOpen }
-  );
-  const userDocuments = userDocumentsData ?? [];
-
-  function handleStartNewReport(documentIds: Array<string>) {
-    setPendingDocumentIds(documentIds);
-    setHasStartedReport(true);
+  function handleStartNewConversation() {
+    setIsStartingFresh(true);
+    dispatch(clearConversationId());
+    setConversation(null);
+    setInput('');
+    setSendError(null);
   }
 
-  const [createReport, { isLoading: isCreateLoading }] = api.useCreateReportMutation();
-  const [continueReport, { isLoading: isContinueLoading }] = api.useContinueReportMutation();
+  const [createConversation, { isLoading: isCreateLoading }] = api.useCreateConversationMutation();
+  const [continueConversation, { isLoading: isContinueLoading }] =
+    api.useContinueConversationMutation();
 
   async function sendMessage() {
     const content = input.trim();
@@ -89,15 +75,11 @@ export default function useChat() {
     setSendError(null);
     setInput('');
     try {
-      const result = report
-        ? await continueReport({ reportId: report.id, prompt: content }).unwrap()
-        : await createReport({
-            prompt: content,
-            scope: 'PUBLIC',
-            chunks: pendingDocumentIds,
-          }).unwrap();
-      setReport(result);
-      dispatch(setReportId(result.id));
+      const result = conversation
+        ? await continueConversation({ conversationId: conversation.id, prompt: content }).unwrap()
+        : await createConversation({ prompt: content }).unwrap();
+      setConversation(result);
+      dispatch(setConversationId(result.id));
     } catch (err) {
       setInput(content);
       setSendError(toErrorMessage(err));
@@ -112,11 +94,7 @@ export default function useChat() {
   }
 
   const isLoading =
-    isGetReportFetching ||
-    isDraftFetching ||
-    isDocsFetching ||
-    isCreateLoading ||
-    isContinueLoading;
+    isGetConversationFetching || isLatestFetching || isCreateLoading || isContinueLoading;
 
   useEffect(() => {
     dispatch(setGlobalLoading(isLoading));
@@ -128,21 +106,14 @@ export default function useChat() {
     };
   }, [dispatch]);
 
-  const messages = buildMessages(report, hasStartedReport);
-
   return {
-    showChatView: hasStartedReport || report !== null,
-    messages,
+    messages: buildMessages(conversation),
+    hasConversation: conversation !== null,
     input,
     setInput,
     handleKeyDown,
     sendMessage,
     sendError,
-    isReportCompleted: report?.status === 'COMPLETED',
-    isDocumentsModalOpen,
-    openDocumentsModal,
-    closeDocumentsModal,
-    userDocuments,
-    handleStartNewReport,
+    handleStartNewConversation,
   };
 }
