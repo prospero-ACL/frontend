@@ -1,9 +1,9 @@
-import { Button } from '@mantine/core';
 // import { useHomePage } from '@/homepage/hooks/use-home-page';
-import { AppShell, Burger, Group, UnstyledButton } from '@mantine/core';
+import { AppShell, UnstyledButton, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import LoginModal from '@/homepage/components/login-modal';
 import Welcome from '@/homepage/components/welcome/welcome';
+import Header from '@/shared/components/header';
 import { useModal } from '@/shared/hooks/use-modal';
 import classes from './home.module.css';
 
@@ -18,33 +18,7 @@ export default function HomePage() {
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true, mobile: !opened } }}
       padding="md"
     >
-      <AppShell.Header>
-        <Group h="100%" px="md">
-          <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-          <Group justify="space-between" style={{ flex: 1 }}>
-            Prospero RAG ACL
-            <Group ml="xl" gap={4} visibleFrom="sm">
-              <UnstyledButton
-                className={classes.control}
-                href="https://github.com/prospero-ACL"
-                component="a"
-                target="_new"
-              >
-                Github
-              </UnstyledButton>
-              <UnstyledButton
-                className={classes.control}
-                href="https://www.linkedin.com/in/themis-darelis-320a608b"
-                component="a"
-                target="_new"
-              >
-                LinkedIn
-              </UnstyledButton>
-              <Button onClick={openLoginModal}>Login</Button>
-            </Group>
-          </Group>
-        </Group>
-      </AppShell.Header>
+      <Header navbarOpened={opened} toggleNavBar={toggle} openLoginModal={openLoginModal} />
 
       <AppShell.Navbar py="md" px={4}>
         <UnstyledButton

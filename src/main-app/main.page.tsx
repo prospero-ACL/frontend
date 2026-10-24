@@ -1,5 +1,6 @@
-import { AppShell, Burger, Button, Group } from '@mantine/core';
+import { AppShell } from '@mantine/core';
 import { Outlet } from 'react-router-dom';
+import Headers from '@/shared/components/header';
 import Navbar from '@/shared/components/navbar';
 import { useMainApp } from './hooks/use-main-app';
 
@@ -12,12 +13,11 @@ export default function MainApp() {
       navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !navbarOpened } }}
       padding="md"
     >
-      <AppShell.Header>
-        <Group h="100%" px="md">
-          <Burger opened={navbarOpened} onClick={toggleNavbar} hiddenFrom="sm" size="sm" />
-          <Button onClick={handleLogout}>Logout</Button>
-        </Group>
-      </AppShell.Header>
+      <Headers
+        handleLogout={handleLogout}
+        toggleNavBar={toggleNavbar}
+        navbarOpened={navbarOpened}
+      />
       <AppShell.Navbar p="md">
         <Navbar />
       </AppShell.Navbar>

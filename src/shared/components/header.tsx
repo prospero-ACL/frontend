@@ -1,17 +1,22 @@
 import { AppShell, Burger, Button, Group, UnstyledButton } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { useModal } from '@/shared/hooks/use-modal';
+import { useAppSelector } from '@/config/store';
 import classes from './header.module.css';
 
-export default function Header({ handleLogout }: { handleLogout: () => void }) {
-  const [opened, { toggle }] = useDisclosure(false);
-  const { open: openLoginModal } = useModal('login');
-  const user = null; // Replace with actual user state from your auth context or store
+export type HeaderProps = {
+  handleLogout?: () => void;
+  openLoginModal?: () => void;
+  toggleNavBar: () => void;
+  navbarOpened: boolean;
+};
+
+export default function Header(props: HeaderProps) {
+  const { handleLogout, toggleNavBar, navbarOpened, openLoginModal } = props;
+  const user = useAppSelector((state) => state.auth.user);
 
   return (
     <AppShell.Header>
       <Group h="100%" px="md">
-        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+        <Burger opened={navbarOpened} onClick={toggleNavBar} hiddenFrom="sm" size="sm" />
         <Group justify="space-between" style={{ flex: 1 }}>
           Prospero RAG ACL
           <Group ml="xl" gap={4} visibleFrom="sm">
