@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Navbar from '@/shared/components/navbar';
 import { useMainApp } from './hooks/use-main-app';
 
-export function MainApp() {
+export default function MainApp() {
   const { navbarOpened, toggleNavbar, handleLogout } = useMainApp();
 
   return (

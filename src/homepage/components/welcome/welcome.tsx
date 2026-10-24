@@ -1,7 +1,7 @@
 import { Anchor, Text, Title } from '@mantine/core';
-import classes from './Welcome.module.css';
+import classes from './welcome.module.css';
 
-export function Welcome() {
+export default function Welcome() {
   return (
     <>
       <Title className={classes.title} ta="center" mt={100}>
