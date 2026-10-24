@@ -11,13 +11,13 @@ This template comes with the following features:
 
 ## App structure
 
-- `/` – logged-out welcome page with a login button
-- `/app` – logged-in shell (`src/pages/main-app/page.tsx`), with:
+- `/` – logged-out welcome page with a login button (`src/homepage/home.page.tsx`)
+- `/app` – logged-in shell (`src/main-app/main.page.tsx`), with:
   - `/app` (index) – free-form chat over the trilogies the user is cleared to read
   - `/app/profile` – user profile and (read-only) clearance
   - `/app/documents` – trilogy titles; patricians can upload a trilogy (title + 3 PDFs)
 
-Each `/app` sub-route is a self-contained feature module under `src/pages/main-app/modules/` (own `index.tsx`, `components/`, `hooks/`).
+Each `/app` sub-route is a self-contained feature module under `src/main-app/modules/` (own `index.tsx`, `components/`, `hooks/`).
 
 ## npm scripts
 

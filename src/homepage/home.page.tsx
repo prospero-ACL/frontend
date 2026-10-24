@@ -1,16 +1,18 @@
 import { Button } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import LoginModal from '@/homepage/components/login-modal';
 import Welcome from '@/homepage/components/welcome/welcome';
+import { useModal } from '@/shared/hooks/use-modal';
+// import { useHomePage } from '@/homepage/hooks/use-home-page';
 
 export default function HomePage() {
-  const [opened, { open, close }] = useDisclosure();
+  // const { openLoginModal } = useHomePage();
+  const { open: openLoginModal } = useModal('login');
 
   return (
     <>
       <Welcome />
-      <Button onClick={open}>Login</Button>
-      <LoginModal opened={opened} close={close} open={open} />
+      <Button onClick={openLoginModal}>Login</Button>
+      <LoginModal />
     </>
   );
 }

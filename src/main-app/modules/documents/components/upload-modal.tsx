@@ -8,18 +8,13 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-import { BOOK_POSITIONS, TrilogyUpload } from '@/shared/dto/document';
+import { BOOK_POSITIONS } from '@/shared/dto/document';
 import { useUploadModal } from '../hooks/use-upload-modal';
 
-export type UploadModalProps = {
-  opened: boolean;
-  onClose: () => void;
-  onSubmit: (upload: TrilogyUpload) => Promise<void>;
-  isLoading: boolean;
-};
-
-export default function UploadModal({ isLoading, opened, onClose, onSubmit }: UploadModalProps) {
+export default function UploadModal() {
   const {
+    opened,
+    isLoading,
     trilogyName,
     setTrilogyName,
     books,
@@ -28,7 +23,7 @@ export default function UploadModal({ isLoading, opened, onClose, onSubmit }: Up
     error,
     handleClose,
     handleSubmit,
-  } = useUploadModal({ onSubmit, onClose });
+  } = useUploadModal();
 
   return (
     <Modal opened={opened} onClose={handleClose} title="Upload trilogy" centered>

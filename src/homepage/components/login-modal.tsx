@@ -1,20 +1,8 @@
 import { Button, Modal, Stack } from '@mantine/core';
+import { useLoginModal } from '@/homepage/hooks/use-login-modal';
 
-export type ModalProps = {
-  opened: boolean;
-  close: () => void;
-  open: () => void;
-};
-
-export default function (props: ModalProps) {
-  const { opened } = props;
-
-  const handleGithubLogin = () => {
-    window.location.href = 'http://localhost:8000/oauth2/authorization/github';
-  };
-  const handleGoogleLogin = () => {
-    window.location.href = 'http://localhost:8000/oauth2/authorization/google';
-  };
+export default function LoginModal() {
+  const { opened, close, handleGithubLogin, handleGoogleLogin } = useLoginModal();
 
   return (
     <Modal opened={opened} onClose={close} title="Authentication" centered>
