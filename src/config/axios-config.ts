@@ -1,33 +1,13 @@
 import { BaseQueryFn } from '@reduxjs/toolkit/query';
 import axios, { AxiosError, AxiosRequestConfig, Method } from 'axios';
+import z from 'zod';
 
 const axiosInstance = axios.create({
   withCredentials: true,
-  baseURL: undefined, // Replace with your API base URL
   headers: {
     'Content-Type': 'application/json',
-    // Add any other headers or configurations you need
   },
 });
-
-// Add a request interceptor
-axiosInstance.interceptors.request.use(
-  (config) => {
-    // You can modify the request config here, e.g., add authentication headers
-    // config.headers.Authorization = `Bearer ${getToken()}`;
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add a response interceptor
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => Promise.reject(error)
-);
-// api.ts
 
 type AxiosBaseQueryArgs = {
   url: string;
@@ -42,11 +22,16 @@ type AxiosBaseQueryError = {
   data: unknown;
 };
 
+// Endpoints opt into response validation with `extraOptions: { dataSchema }`.
+type AxiosBaseQueryExtraOptions = {
+  dataSchema?: z.ZodType;
+};
+
 const axiosBaseQuery =
   (
     { baseUrl }: { baseUrl?: string } = { baseUrl: '' }
-  ): BaseQueryFn<AxiosBaseQueryArgs, unknown, AxiosBaseQueryError> =>
-  async ({ url, method, data, params, headers }) => {
+  ): BaseQueryFn<AxiosBaseQueryArgs, unknown, AxiosBaseQueryError, AxiosBaseQueryExtraOptions> =>
+  async ({ url, method, data, params, headers }, _api, extraOptions) => {
     try {
       const result = await axiosInstance({
         url: baseUrl + url,
@@ -55,7 +40,22 @@ const axiosBaseQuery =
         params,
         headers,
       });
-      return { data: result.data };
+
+      const schema = extraOptions?.dataSchema;
+      if (!schema) {
+        return { data: result.data };
+      }
+
+      const parsed = schema.safeParse(result.data);
+      if (!parsed.success) {
+        return {
+          error: {
+            status: result.status,
+            data: `Response failed validation: ${z.prettifyError(parsed.error)}`,
+          },
+        };
+      }
+      return { data: parsed.data };
     } catch (axiosError) {
       const err = axiosError as AxiosError;
 
@@ -67,13 +67,5 @@ const axiosBaseQuery =
       };
     }
   };
-
-export const axiosInstanceBootstrap = axiosInstance.create({
-  withCredentials: true,
-  baseURL: 'http://localhost:5173',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
 
 export default axiosBaseQuery;

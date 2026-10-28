@@ -1,30 +1,38 @@
-import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 import api from '@/config/api';
 import { setGlobalLoading } from '@/config/reducers/loading.reducer';
 import { useAppDispatch } from '@/config/store';
-import { isIngestionFinished, TrilogyUpload } from '@/shared/dto/document';
+import { isIngestionFinished } from '@/shared/dto/document';
 import { useClearance } from '@/shared/hooks/use-clearance';
+import { useModal } from '@/shared/hooks/use-modal';
 
 const INGESTION_POLL_MS = 2000;
+
+// Shared with use-upload-modal, so the queued job started by the modal is visible here.
+export const UPLOAD_TRILOGY_CACHE_KEY = 'upload-trilogy';
 
 export function useDocs() {
   const dispatch = useAppDispatch();
   const { isPatrician, isLoading: isClearanceLoading } = useClearance();
+  const { open: openUploadModal } = useModal('uploadTrilogy');
 
   const { data, isLoading: isGetTrilogiesLoading } = api.useGetTrilogiesQuery();
   const trilogies = data || [];
-  const [uploadTrilogy, { isLoading: isUploadLoading }] = api.useUploadTrilogyMutation();
-  const [isUploadModalOpened, { open: openUploadModal, close: closeUploadModal }] =
-    useDisclosure(false);
+  const [, { data: queuedJob, isLoading: isUploadLoading }] = api.useUploadTrilogyMutation({
+    fixedCacheKey: UPLOAD_TRILOGY_CACHE_KEY,
+  });
 
   // Embedding runs server-side after the upload returns, so the job is polled until it ends.
-  const [jobId, setJobId] = useState<string | null>(null);
+  const jobId = queuedJob?.id;
   const [pollingInterval, setPollingInterval] = useState(INGESTION_POLL_MS);
   const { data: job } = api.useGetIngestionQuery(jobId ?? '', {
     skip: !jobId,
     pollingInterval,
   });
+
+  useEffect(() => {
+    setPollingInterval(INGESTION_POLL_MS);
+  }, [jobId]);
 
   useEffect(() => {
     if (!job || !isIngestionFinished(job)) {
@@ -35,12 +43,6 @@ export function useDocs() {
       dispatch(api.util.invalidateTags(['Docs']));
     }
   }, [job, dispatch]);
-
-  async function handleUpload(upload: TrilogyUpload) {
-    const queued = await uploadTrilogy(upload).unwrap();
-    setPollingInterval(INGESTION_POLL_MS);
-    setJobId(queued.id);
-  }
 
   const isLoading = isGetTrilogiesLoading || isClearanceLoading || isUploadLoading;
 
@@ -58,9 +60,6 @@ export function useDocs() {
     trilogies,
     canUpload: isPatrician,
     job,
-    handleUpload,
-    isUploadModalOpened,
     openUploadModal,
-    closeUploadModal,
   };
 }

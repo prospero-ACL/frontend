@@ -4,19 +4,18 @@ import { IngestionJob, TrilogyUpload } from '@/shared/dto/document';
 import { SecurityLevelResponse } from '@/shared/dto/security-level';
 import { User, userSchema } from '@/shared/dto/user';
 import axiosBaseQuery from './axios-config';
-import { resetUser } from './reducers/auth.reducer';
 
 const api = createApi({
   reducerPath: 'api',
   baseQuery: axiosBaseQuery({ baseUrl: '/api' }),
-  tagTypes: ['Auth', 'Docs', 'Conversations', 'SecurityLevel'],
+  tagTypes: ['Docs', 'Conversations', 'SecurityLevel'],
   endpoints: (builder) => ({
-    getUserMe: builder.query<User | null, void>({
+    // Fired once from store.ts on load; the auth slice mirrors its result (auth.reducer.ts).
+    getUserMe: builder.query<User, void>({
       query: () => ({
         url: '/me',
         method: 'GET',
       }),
-      providesTags: ['Auth'],
       extraOptions: {
         dataSchema: userSchema,
       },
@@ -26,12 +25,11 @@ const api = createApi({
         url: '/logout',
         method: 'POST',
       }),
-      invalidatesTags: ['Auth'],
+      // The auth slice resets itself on logout settle; this clears every cached query too.
       async onQueryStarted(_args, { dispatch, queryFulfilled }) {
         try {
           await queryFulfilled;
         } finally {
-          dispatch(resetUser());
           dispatch(api.util.resetApiState());
         }
       },

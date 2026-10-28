@@ -6,15 +6,7 @@ import UploadModal from './components/upload-modal';
 import { useDocs } from './hooks/use-docs';
 
 export default function Docs() {
-  const {
-    trilogies,
-    canUpload,
-    job,
-    handleUpload,
-    isUploadModalOpened,
-    openUploadModal,
-    closeUploadModal,
-  } = useDocs();
+  const { trilogies, canUpload, job, openUploadModal } = useDocs();
   const isLoading = useAppSelector((state) => state.loading.isLoading);
 
   return (
@@ -30,12 +22,7 @@ export default function Docs() {
       {canUpload && (
         <>
           <Button onClick={openUploadModal}>Upload trilogy</Button>
-          <UploadModal
-            isLoading={isLoading}
-            opened={isUploadModalOpened}
-            onClose={closeUploadModal}
-            onSubmit={handleUpload}
-          />
+          <UploadModal />
         </>
       )}
     </Stack>

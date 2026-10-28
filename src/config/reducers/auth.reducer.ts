@@ -1,7 +1,6 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AxiosError } from 'axios';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
 import { User } from '@/shared/dto/user';
-import { axiosInstanceBootstrap } from '../axios-config';
+import api from '../api';
 
 export type AuthState = {
   user: User | null;
@@ -19,55 +18,42 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
-    },
-
     resetUser: (state) => {
       state.user = null;
       state.isAuthenticated = false;
+      state.isLoading = false;
     },
   },
 
+  // Driven by api.getUserMe (dispatched once from store.ts) and api.logout.
   extraReducers: (builder) => {
     builder
-      .addCase(onBootStrap.pending, (state) => {
+      .addMatcher(api.endpoints.getUserMe.matchPending, (state) => {
         state.isLoading = true;
       })
 
-      .addCase(onBootStrap.fulfilled, (state, action) => {
+      .addMatcher(api.endpoints.getUserMe.matchFulfilled, (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = true;
         state.isLoading = false;
       })
 
-      .addCase(onBootStrap.rejected, (state) => {
-        state.user = null;
-        state.isAuthenticated = false;
-        state.isLoading = false;
-      });
+      .addMatcher(api.endpoints.getUserMe.matchRejected, (state, action) => {
+        // RTK Query also "rejects" a request it skipped as a duplicate; that's not a logout.
+        if (action.meta.condition) return;
+        authSlice.caseReducers.resetUser(state);
+      })
+
+      // On settle, not just success, so a failed POST /logout still clears the UI.
+      .addMatcher(
+        isAnyOf(api.endpoints.logout.matchFulfilled, api.endpoints.logout.matchRejected),
+        (state) => {
+          authSlice.caseReducers.resetUser(state);
+        }
+      );
   },
 });
 
-export const onBootStrap = createAsyncThunk<User, void, { rejectValue: string }>(
-  'auth/onBootStrap',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await axiosInstanceBootstrap.get('/api/me');
-
-      return response.data;
-    } catch (error) {
-      const err = error as AxiosError;
-
-      if (err.response?.status === 401) {
-        return rejectWithValue('Unauthorized');
-      }
-
-      return rejectWithValue('Bootstrap failed');
-    }
-  }
-);
-
-export const { setUser, resetUser } = authSlice.actions;
+export const { resetUser } = authSlice.actions;
 
 export default authSlice.reducer;

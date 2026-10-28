@@ -1,5 +1,6 @@
-import { LoadingOverlay, Stack, Text } from '@mantine/core';
+import { Divider, LoadingOverlay, Stack, Text } from '@mantine/core';
 import { useAppSelector } from '@/config/store';
+import ColorSchemeToggle from '@/main-app/modules/profile/color-scheme-toggle';
 import { useProfile } from './hooks/use-profile';
 
 export default function Profile() {
@@ -15,6 +16,8 @@ export default function Profile() {
         Your clearance decides which books are used to answer you. It is assigned by an
         administrator and cannot be changed here.
       </Text>
+      <Divider my="md" />
+      <ColorSchemeToggle />
     </Stack>
   );
 }

@@ -1,5 +1,10 @@
-import { useState } from 'react';
-import { BOOK_POSITIONS, BookPosition, TrilogyUpload } from '@/shared/dto/document';
+import { useEffect, useState } from 'react';
+import api from '@/config/api';
+import { closeModal } from '@/config/reducers/modals.reducer';
+import { useAppDispatch, useAppSelector } from '@/config/store';
+import { BOOK_POSITIONS, BookPosition } from '@/shared/dto/document';
+import { useModal } from '@/shared/hooks/use-modal';
+import { UPLOAD_TRILOGY_CACHE_KEY } from './use-docs';
 
 type BookFiles = Record<BookPosition, File | null>;
 
@@ -19,15 +24,22 @@ function toErrorMessage(err: unknown): string {
   return 'Upload failed. Please try again.';
 }
 
-export type UseUploadModalArgs = {
-  onSubmit: (upload: TrilogyUpload) => Promise<void>;
-  onClose: () => void;
-};
+export function useUploadModal() {
+  const dispatch = useAppDispatch();
+  const { opened, close } = useModal('uploadTrilogy');
+  const isLoading = useAppSelector((state) => state.loading.isLoading);
+  const [uploadTrilogy] = api.useUploadTrilogyMutation({ fixedCacheKey: UPLOAD_TRILOGY_CACHE_KEY });
 
-export function useUploadModal({ onSubmit, onClose }: UseUploadModalArgs) {
   const [trilogyName, setTrilogyName] = useState('');
   const [books, setBooks] = useState<BookFiles>(EMPTY_BOOKS);
   const [error, setError] = useState<string | null>(null);
+
+  // Leaving the page must not leave the modal open for the next visit.
+  useEffect(() => {
+    return () => {
+      dispatch(closeModal('uploadTrilogy'));
+    };
+  }, [dispatch]);
 
   const canSubmit =
     trilogyName.trim().length > 0 && BOOK_POSITIONS.every((position) => books[position]);
@@ -40,7 +52,7 @@ export function useUploadModal({ onSubmit, onClose }: UseUploadModalArgs) {
     setTrilogyName('');
     setBooks(EMPTY_BOOKS);
     setError(null);
-    onClose();
+    close();
   }
 
   async function handleSubmit() {
@@ -49,10 +61,10 @@ export function useUploadModal({ onSubmit, onClose }: UseUploadModalArgs) {
     }
     setError(null);
     try {
-      await onSubmit({
+      await uploadTrilogy({
         trilogyName: trilogyName.trim(),
         books: BOOK_POSITIONS.map((position) => ({ position, file: books[position]! })),
-      });
+      }).unwrap();
       handleClose();
     } catch (err) {
       setError(toErrorMessage(err));
@@ -60,6 +72,8 @@ export function useUploadModal({ onSubmit, onClose }: UseUploadModalArgs) {
   }
 
   return {
+    opened,
+    isLoading,
     trilogyName,
     setTrilogyName,
     books,
