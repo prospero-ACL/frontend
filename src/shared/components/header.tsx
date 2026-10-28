@@ -1,5 +1,6 @@
-import { AppShell, Burger, Button, Group, UnstyledButton } from '@mantine/core';
+import { AppShell, Burger, Button, Group, Image, Text, UnstyledButton } from '@mantine/core';
 import { useAppSelector } from '@/config/store';
+import logo from '@/favicon.svg';
 import classes from './header.module.css';
 
 export type HeaderProps = {
@@ -24,7 +25,10 @@ export default function Header(props: HeaderProps) {
           <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
         )}
         <Group justify="space-between" style={{ flex: 1 }}>
-          Prospero RAG ACL
+          <Group gap="xs" wrap="nowrap">
+            <Image src={logo} alt="" w={28} h={28} radius={6} />
+            <Text fw={700}>Prospero RAG ACL</Text>
+          </Group>
           <Group ml="xl" gap={4} visibleFrom="sm">
             <UnstyledButton
               className={classes.control}
