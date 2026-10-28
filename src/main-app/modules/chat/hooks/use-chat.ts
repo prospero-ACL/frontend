@@ -1,9 +1,9 @@
-import { KeyboardEvent, useEffect, useState } from 'react';
+import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import api from '@/config/api';
 import { clearConversationId, setConversationId } from '@/config/reducers/conversation.reducer';
 import { setGlobalLoading } from '@/config/reducers/loading.reducer';
 import { useAppDispatch, useAppSelector } from '@/config/store';
-import { Conversation } from '@/shared/dto/chat';
+import { ChatMessage, Conversation } from '@/shared/dto/chat';
 import { buildMessages } from '../utils/messages';
 
 function toErrorMessage(err: unknown): string {
@@ -25,6 +25,9 @@ export default function useChat() {
   const [isStartingFresh, setIsStartingFresh] = useState(false);
   const [input, setInput] = useState('');
   const [sendError, setSendError] = useState<string | null>(null);
+  // The prompt being sent, shown immediately until the backend's reply replaces it.
+  const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const {
     data: fetchedConversation,
@@ -61,6 +64,7 @@ export default function useChat() {
     setConversation(null);
     setInput('');
     setSendError(null);
+    setPendingPrompt(null);
   }
 
   const [createConversation, { isLoading: isCreateLoading }] = api.useCreateConversationMutation();
@@ -74,6 +78,7 @@ export default function useChat() {
     }
     setSendError(null);
     setInput('');
+    setPendingPrompt(content);
     try {
       const result = conversation
         ? await continueConversation({ conversationId: conversation.id, prompt: content }).unwrap()
@@ -83,6 +88,8 @@ export default function useChat() {
     } catch (err) {
       setInput(content);
       setSendError(toErrorMessage(err));
+    } finally {
+      setPendingPrompt(null);
     }
   }
 
@@ -106,8 +113,18 @@ export default function useChat() {
     };
   }, [dispatch]);
 
+  const messages: Array<ChatMessage> = pendingPrompt
+    ? [...buildMessages(conversation), { id: 'pending-user', role: 'user', content: pendingPrompt }]
+    : buildMessages(conversation);
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    viewport?.scrollTo({ top: viewport.scrollHeight, behavior: 'smooth' });
+  }, [messages.length]);
+
   return {
-    messages: buildMessages(conversation),
+    messages,
+    viewportRef,
     hasConversation: conversation !== null,
     input,
     setInput,
