@@ -3,6 +3,7 @@ import api from '@/config/api';
 
 export function useMainApp() {
   const [navbarOpened, { toggle: toggleNavbar }] = useDisclosure();
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [logout] = api.useLogoutMutation();
 
   async function handleLogout() {
@@ -12,6 +13,8 @@ export function useMainApp() {
   return {
     navbarOpened,
     toggleNavbar,
+    desktopOpened,
+    toggleDesktop,
     handleLogout,
   };
 }
