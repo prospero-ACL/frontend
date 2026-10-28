@@ -1,15 +1,17 @@
-// import { useHomePage } from '@/homepage/hooks/use-home-page';
-import { AppShell, UnstyledButton, Button } from '@mantine/core';
+import { AppShell, UnstyledButton, Button, Stack, Space } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import ClearanceTiers from '@/homepage/components/clearance-tiers/clearance-tiers';
+import ExampleMarquee from '@/homepage/components/example-marquee/example-marquee';
+import FinalCta from '@/homepage/components/final-cta/final-cta';
+import HowItWorks from '@/homepage/components/how-it-works/how-it-works';
 import LoginModal from '@/homepage/components/login-modal';
 import Welcome from '@/homepage/components/welcome/welcome';
+import { useHomePage } from '@/homepage/hooks/use-home-page';
 import Header from '@/shared/components/header';
-import { useModal } from '@/shared/hooks/use-modal';
 import classes from './home.module.css';
 
 export default function HomePage() {
-  // const { openLoginModal } = useHomePage();
-  const { open: openLoginModal } = useModal('login');
+  const { openLoginModal } = useHomePage();
   const [opened, { toggle }] = useDisclosure();
 
   return (
@@ -41,9 +43,18 @@ export default function HomePage() {
       </AppShell.Navbar>
 
       <AppShell.Main>
-        Navbar is only visible on mobile, links that are rendered in the header on desktop are
-        hidden on mobile in header and rendered in navbar instead.
-        <Welcome />
+        <Stack className={classes.main} align="center" gap="xl">
+          <Welcome />
+          <Space h="xl" />
+          <ExampleMarquee />
+          <Space h="xl" />
+          <HowItWorks />
+          <Space h="xl" />
+          <ClearanceTiers />
+          <Space h="xl" />
+          <FinalCta />
+          <Space h="xl" />
+        </Stack>
         <LoginModal />
       </AppShell.Main>
     </AppShell>

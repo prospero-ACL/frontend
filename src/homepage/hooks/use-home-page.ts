@@ -1,3 +1,7 @@
+import { useModal } from '@/shared/hooks/use-modal';
+
 export function useHomePage() {
-  return {};
+  const { open: openLoginModal } = useModal('login');
+
+  return { openLoginModal };
 }
