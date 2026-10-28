@@ -1,6 +1,7 @@
-import { Button, Group, LoadingOverlay, Stack, Text, Textarea } from '@mantine/core';
+import { Button, Group, Stack, Text } from '@mantine/core';
 import { useAppSelector } from '@/config/store';
 import MessageList from './components/message-list';
+import PromptBar from './components/prompt-bar';
 import useChat from './hooks/use-chat';
 
 export default function Chat() {
@@ -18,7 +19,6 @@ export default function Chat() {
 
   return (
     <Stack p="sm" pos="relative" h="100%">
-      <LoadingOverlay visible={isLoading} />
       <Group justify="flex-end">
         <Button
           variant="outline"
@@ -30,21 +30,14 @@ export default function Chat() {
         </Button>
       </Group>
       <MessageList messages={messages} />
-      <Group mt="sm" align="flex-start">
-        <Textarea
-          style={{ flex: 1 }}
-          placeholder="Type your message here..."
-          autosize
-          minRows={1}
-          maxRows={4}
-          value={input}
-          onChange={(event) => setInput(event.currentTarget.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <Button variant="outline" color="blue" onClick={sendMessage} disabled={!input.trim()}>
-          Send
-        </Button>
-      </Group>
+      <PromptBar
+        input={input}
+        setInput={setInput}
+        handleKeyDown={handleKeyDown}
+        sendMessage={sendMessage}
+        isLoading={isLoading}
+        sendError={sendError}
+      />
       {sendError && (
         <Text size="sm" c="red">
           {sendError}
