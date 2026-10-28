@@ -13,10 +13,10 @@ export default function PromptBar(props: PromptBarProps) {
   const { input, setInput, handleKeyDown, sendMessage, isLoading, sendError } = props;
 
   return (
-    <Group mt="sm" align="flex-start">
+    <Group align="flex-start">
       <Textarea
         disabled={isLoading || !!sendError}
-        style={{ flex: 1 }}
+        flex={1}
         placeholder="Type your message here..."
         autosize
         minRows={1}
