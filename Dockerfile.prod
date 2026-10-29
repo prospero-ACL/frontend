@@ -1,0 +1,15 @@
+FROM node:26-alpine AS build
+
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# Caddy serves the static build and reverse-proxies the backend; its Caddyfile lives in infra
+# Simpler then nginx
+FROM caddy:2-alpine
+
+COPY --from=build /app/dist /srv
