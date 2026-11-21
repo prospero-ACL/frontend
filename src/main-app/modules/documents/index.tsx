@@ -1,4 +1,4 @@
-import { Button, LoadingOverlay, Stack, Text } from '@mantine/core';
+import { Button, Stack, Text } from '@mantine/core';
 import { useAppSelector } from '@/config/store';
 import IngestionProgress from './components/ingestion-progress';
 import Table from './components/table';
@@ -11,17 +11,19 @@ export default function Docs() {
 
   return (
     <Stack pos="relative">
-      <LoadingOverlay visible={isLoading} />
+      {/* <LoadingOverlay visible={isLoading} /> */}
       <Text>Trilogies</Text>
       <Text size="sm" c="dimmed">
         Every title is listed for everyone. How much of each trilogy is used to answer you depends
         on your clearance.
       </Text>
       <Table trilogies={trilogies} />
-      {job && <IngestionProgress job={job} />}
+      {job && isLoading && <IngestionProgress job={job} />}
       {canUpload && (
         <>
-          <Button onClick={openUploadModal}>Upload trilogy</Button>
+          <Button loading={isLoading} onClick={openUploadModal}>
+            Upload trilogy
+          </Button>
           <UploadModal />
         </>
       )}
